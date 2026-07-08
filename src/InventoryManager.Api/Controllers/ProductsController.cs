@@ -66,9 +66,51 @@ public class ProductsController : ControllerBase
 
         return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
     }
+
+    [HttpPut("{id}")]
+    public ActionResult<ProductResponse> UpdateProduct(int id, UpdateProductRequest request)
+    {
+        var productIndex = Products.FindIndex(p => p.Id == id);
+        if (productIndex == -1)
+        {
+            return NotFound();
+        }
+
+        var updatedProduct = Products[productIndex] with
+        {
+            Sku = request.Sku,
+            Name = request.Name,
+            Description = request.Description,
+            Price = request.Price,
+            QuantityInStock = request.QuantityInStock
+        };
+
+        return Ok(updatedProduct);
+    }
+
+    [HttpDelete("{id}")]
+    public ActionResult DeleteProduct(int id)
+    {
+        var productIndex = Products.FindIndex(p => p.Id == id);
+        if (productIndex == -1)
+        {
+            return NotFound();
+        }
+
+        Products.RemoveAt(productIndex);
+        return NoContent();
+    }
 }
 
 public record CreateProductRequest(
+    string Sku,
+    string Name,
+    string? Description,
+    decimal Price,
+    int QuantityInStock
+);
+
+public record UpdateProductRequest(
     string Sku,
     string Name,
     string? Description,
