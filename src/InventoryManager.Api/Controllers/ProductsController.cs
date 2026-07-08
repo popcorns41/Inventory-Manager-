@@ -1,186 +1,77 @@
+using InventoryManager.Application.Products;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryManager.Api.Controllers;
+
+//TODO: Validation!
 
 [ApiController]
 [Route("api/[controller]")]
 public class ProductsController : ControllerBase
 {
-    //Temporary DS of product responses
-    //TODO: Replace with actual data source
+    private readonly IProductService _productService;
 
-    private static readonly List<ProductResponse> Products =
-    [
-        new ProductResponse(
-            Id: 1,
-            Sku: "SKU-001",
-            Name: "Mechanical Keyboard",
-            Description: "Compact mechanical keyboard",
-            Price: 79.99m,
-            QuantityInStock: 25
-        ),
-        new ProductResponse(
-            Id: 2,
-            Sku: "SKU-002",
-            Name: "USB-C Cable",
-            Description: "1m USB-C charging cable",
-            Price: 9.99m,
-            QuantityInStock: 100
-        )
-    ];
+    public ProductsController(IProductService productService)
+    {
+        _productService = productService;
+    }
 
     [HttpGet]
     public ActionResult<IEnumerable<ProductResponse>> GetProducts()
     {
-        return Ok(Products);
+        var products = _productService.GetProducts();
+
+        return Ok(products);
     }
 
-    [HttpGet("{id}")]
-    public ActionResult<ProductResponse> GetProduct(int id)
+    [HttpGet("{id:int}")]
+    public ActionResult<ProductResponse> GetProductById(int id)
     {
-        var product = Products.FirstOrDefault(p => p.Id == id);
-        if (product == null)
+        var product = _productService.GetProductById(id);
+
+        if (product is null)
         {
             return NotFound();
         }
+
         return Ok(product);
     }
 
-
-    //BIG NOTE: This appends to the in-memory list of products, hence volatile, will lose product when restarting the app.
     [HttpPost]
     public ActionResult<ProductResponse> CreateProduct(CreateProductRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.Sku))
-        {
-            return BadRequest("SKU is required.");
-        }
+        var product = _productService.CreateProduct(request);
 
-        if (string.IsNullOrWhiteSpace(request.Name))
-        {
-            return BadRequest("Name is required.");
-        }
-
-        if (request.Price < 0)
-        {
-            return BadRequest("Price cannot be negative.");
-        }
-
-        if (request.QuantityInStock < 0)
-        {
-            return BadRequest("Quantity in stock cannot be negative.");
-        }
-
-        var skuAlreadyExists = Products.Any(product =>
-            product.Sku.Equals(request.Sku, StringComparison.OrdinalIgnoreCase));
-
-        if (skuAlreadyExists)
-        {
-            return Conflict($"A product with SKU '{request.Sku}' already exists.");
-        }
-
-        var nextId = Products.Max(p => p.Id) + 1;
-
-        var product = new ProductResponse(
-            Id: nextId,
-            Sku: request.Sku,
-            Name: request.Name,
-            Description: request.Description,
-            Price: request.Price,
-            QuantityInStock: request.QuantityInStock
+        return CreatedAtAction(
+            nameof(GetProductById),
+            new { id = product.Id },
+            product
         );
-
-        Products.Add(product);
-
-        return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     public ActionResult<ProductResponse> UpdateProduct(int id, UpdateProductRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.Sku))
-        {
-            return BadRequest("SKU is required.");
-        }
+        var updatedProduct = _productService.UpdateProduct(id, request);
 
-        if (string.IsNullOrWhiteSpace(request.Name))
-        {
-            return BadRequest("Name is required.");
-        }
-
-        if (request.Price < 0)
-        {
-            return BadRequest("Price cannot be negative.");
-        }
-
-        if (request.QuantityInStock < 0)
-        {
-            return BadRequest("Quantity in stock cannot be negative.");
-        }
-
-        // Check if the SKU already exists for another product
-        var skuAlreadyExists = Products.Any(product =>
-            product.Id != id &&
-            product.Sku.Equals(request.Sku, StringComparison.OrdinalIgnoreCase));
-
-        if (skuAlreadyExists)
-        {
-            return Conflict($"A product with SKU '{request.Sku}' already exists.");
-        }
-
-        var productIndex = Products.FindIndex(p => p.Id == id);
-        if (productIndex == -1)
+        if (updatedProduct is null)
         {
             return NotFound();
         }
-
-        var updatedProduct = Products[productIndex] with
-        {
-            Sku = request.Sku,
-            Name = request.Name,
-            Description = request.Description,
-            Price = request.Price,
-            QuantityInStock = request.QuantityInStock
-        };
 
         return Ok(updatedProduct);
     }
 
-    [HttpDelete("{id}")]
-    public ActionResult DeleteProduct(int id)
+    [HttpDelete("{id:int}")]
+    public IActionResult DeleteProduct(int id)
     {
-        var productIndex = Products.FindIndex(p => p.Id == id);
-        if (productIndex == -1)
+        var deleted = _productService.DeleteProduct(id);
+
+        if (!deleted)
         {
             return NotFound();
         }
 
-        Products.RemoveAt(productIndex);
         return NoContent();
     }
 }
-
-public record CreateProductRequest(
-    string Sku,
-    string Name,
-    string? Description,
-    decimal Price,
-    int QuantityInStock
-);
-
-public record UpdateProductRequest(
-    string Sku,
-    string Name,
-    string? Description,
-    decimal Price,
-    int QuantityInStock
-);
-
-public record ProductResponse(
-    int Id,
-    string Sku,
-    string Name,
-    string? Description,
-    decimal Price,
-    int QuantityInStock
-);

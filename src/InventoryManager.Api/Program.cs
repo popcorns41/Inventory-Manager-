@@ -1,6 +1,13 @@
+using InventoryManager.Application.Products;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+
+//Temporary DS of product responses, will change to a database or other data source in the future
+//TODO: Replace with actual data source
+
+builder.Services.AddSingleton<IProductService, ProductService>();
 
 builder.Services.AddOpenApi();
 
