@@ -51,6 +51,34 @@ public class ProductsController : ControllerBase
     [HttpPost]
     public ActionResult<ProductResponse> CreateProduct(CreateProductRequest request)
     {
+        if (string.IsNullOrWhiteSpace(request.Sku))
+        {
+            return BadRequest("SKU is required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Name))
+        {
+            return BadRequest("Name is required.");
+        }
+
+        if (request.Price < 0)
+        {
+            return BadRequest("Price cannot be negative.");
+        }
+
+        if (request.QuantityInStock < 0)
+        {
+            return BadRequest("Quantity in stock cannot be negative.");
+        }
+
+        var skuAlreadyExists = Products.Any(product =>
+            product.Sku.Equals(request.Sku, StringComparison.OrdinalIgnoreCase));
+
+        if (skuAlreadyExists)
+        {
+            return Conflict($"A product with SKU '{request.Sku}' already exists.");
+        }
+
         var nextId = Products.Max(p => p.Id) + 1;
 
         var product = new ProductResponse(
@@ -70,6 +98,36 @@ public class ProductsController : ControllerBase
     [HttpPut("{id}")]
     public ActionResult<ProductResponse> UpdateProduct(int id, UpdateProductRequest request)
     {
+        if (string.IsNullOrWhiteSpace(request.Sku))
+        {
+            return BadRequest("SKU is required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Name))
+        {
+            return BadRequest("Name is required.");
+        }
+
+        if (request.Price < 0)
+        {
+            return BadRequest("Price cannot be negative.");
+        }
+
+        if (request.QuantityInStock < 0)
+        {
+            return BadRequest("Quantity in stock cannot be negative.");
+        }
+
+        // Check if the SKU already exists for another product
+        var skuAlreadyExists = Products.Any(product =>
+            product.Id != id &&
+            product.Sku.Equals(request.Sku, StringComparison.OrdinalIgnoreCase));
+
+        if (skuAlreadyExists)
+        {
+            return Conflict($"A product with SKU '{request.Sku}' already exists.");
+        }
+
         var productIndex = Products.FindIndex(p => p.Id == id);
         if (productIndex == -1)
         {
