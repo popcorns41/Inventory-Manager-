@@ -8,4 +8,13 @@ public interface IProductService
     Task<ProductResponse?> GetProductByIdAsync(
         int id,
         CancellationToken cancellationToken);
+
+    Task<ProductResponse> CreateProductAsync(
+        CreateProductRequest request,
+        CancellationToken cancellationToken);
+    
+    Task<bool> DeleteProductAsync(
+        int id,
+        CancellationToken cancellationToken
+    );
 }

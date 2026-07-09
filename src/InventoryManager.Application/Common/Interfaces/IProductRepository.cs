@@ -10,4 +10,17 @@ public interface IProductRepository
     Task<Product?> GetByIdAsync(
         int id,
         CancellationToken cancellationToken);
+
+    Task<bool> SkuExistsAsync(
+        string sku,
+        CancellationToken cancellationToken);
+
+    Task AddAsync(
+        Product product,
+        CancellationToken cancellationToken);
+
+    Task<bool> DeleteAsync(
+        int id,
+        CancellationToken cancellationToken
+    );
 }

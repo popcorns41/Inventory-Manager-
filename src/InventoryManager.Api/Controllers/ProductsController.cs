@@ -37,4 +37,47 @@ public class ProductsController : ControllerBase
 
         return Ok(product);
     }
+
+    [HttpPost]
+    public async Task<ActionResult<ProductResponse>> CreateProduct(
+        CreateProductRequest request,
+        CancellationToken cancellationToken
+    )
+    {
+        try
+        {
+            var product = await _productService.CreateProductAsync(
+                request,
+                cancellationToken);
+            
+            return CreatedAtAction(
+                nameof(GetProductById),
+                new {id = product.Id},
+                product
+            );
+        }catch (ArgumentException exception)
+        {
+            return BadRequest(exception.Message);
+        }
+        catch (InvalidOperationException exception)
+        {
+            return Conflict(exception.Message);
+        }
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteProduct(
+        int id,
+        CancellationToken cancellationToken
+    )
+    {
+        var deleted = await _productService.DeleteProductAsync(
+            id,
+            cancellationToken
+        );
+
+        if (!deleted) return NotFound();
+
+        return NoContent();
+    }
 }

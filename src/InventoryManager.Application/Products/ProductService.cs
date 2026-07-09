@@ -1,4 +1,5 @@
 using InventoryManager.Application.Common.Interfaces;
+using InventoryManager.Domain.Products;
 
 namespace InventoryManager.Application.Products;
 
@@ -39,6 +40,54 @@ public class ProductService : IProductService
             return null;
         }
 
+        return new ProductResponse(
+            product.Id,
+            product.Sku,
+            product.Name,
+            product.Description,
+            product.Price,
+            product.QuantityInStock
+        );
+    }
+
+    public async Task<ProductResponse> CreateProductAsync(
+        CreateProductRequest request,
+        CancellationToken cancellationToken)
+    {
+        var skuAlreadyExists = await _productRepository.SkuExistsAsync(
+            request.Sku,
+            cancellationToken);
+        
+        if(skuAlreadyExists)
+        {
+            throw new InvalidOperationException(
+                $"A product with SKU '{request.Sku}' already exists."
+            );
+        }
+
+        var product = new Product(
+            request.Sku,
+            request.Name,
+            request.Description,
+            request.Price,
+            request.QuantityInStock
+        );
+
+        await _productRepository.AddAsync(product, cancellationToken);
+
+        return MapToResponse(product);
+    }
+
+    public async Task<bool> DeleteProductAsync(
+        int id,
+        CancellationToken cancellationToken
+    )
+    {
+        return await _productRepository.DeleteAsync(id, cancellationToken);
+    }
+
+    private static ProductResponse MapToResponse(Product product)
+    {
         return new ProductResponse(
             product.Id,
             product.Sku,
