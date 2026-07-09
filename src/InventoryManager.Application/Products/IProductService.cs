@@ -1,3 +1,5 @@
+using InventoryManager.Domain.Products;
+
 namespace InventoryManager.Application.Products;
 
 public interface IProductService
@@ -15,6 +17,12 @@ public interface IProductService
     
     Task<bool> DeleteProductAsync(
         int id,
+        CancellationToken cancellationToken
+    );
+
+    Task<ProductResponse?> UpdateProductAsync(
+        int id,
+        UpdateProductRequest request,
         CancellationToken cancellationToken
     );
 }

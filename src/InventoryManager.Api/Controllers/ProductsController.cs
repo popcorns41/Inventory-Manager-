@@ -80,4 +80,33 @@ public class ProductsController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult<ProductResponse>> UpdateProduct(
+        int id,
+        UpdateProductRequest request,
+        CancellationToken cancellationToken
+    )
+    {
+        try
+        {
+            var updatedProduct = await _productService.UpdateProductAsync(
+                id,
+                request,
+                cancellationToken
+            );
+
+            if (updatedProduct is null) return NotFound();
+
+            return Ok(updatedProduct);
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(exception.Message);
+        }
+        catch (InvalidOperationException exception)
+        {
+            return Conflict(exception.Message);
+        }
+    }
 }

@@ -86,6 +86,47 @@ public class ProductService : IProductService
         return await _productRepository.DeleteAsync(id, cancellationToken);
     }
 
+    public async Task<ProductResponse?> UpdateProductAsync(
+        int id,
+        UpdateProductRequest request,
+        CancellationToken cancellationToken
+    )
+    {
+        var product = await _productRepository.getByIdForUpdateAsync(
+            id,
+            cancellationToken
+        );
+
+        if (product is null)
+        {
+            return null;
+        }
+
+        var skuAlreadyExists = await _productRepository.SkuExistsforAnotherProductAsync(
+            request.Sku,
+            id,
+            cancellationToken
+        );
+
+        if (skuAlreadyExists)
+        {
+            throw new InvalidOperationException(
+                $"A product with SKU '{request.Sku}' already exists."
+            );
+        }
+
+        product.Update(
+            request.Sku,
+            request.Name,
+            request.Description,
+            request.Price,
+            request.QuantityInStock
+        );
+        await _productRepository.SaveChangesAsync(cancellationToken);
+        
+        return MapToResponse(product);
+    }
+
     private static ProductResponse MapToResponse(Product product)
     {
         return new ProductResponse(

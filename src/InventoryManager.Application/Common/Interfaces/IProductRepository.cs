@@ -23,4 +23,18 @@ public interface IProductRepository
         int id,
         CancellationToken cancellationToken
     );
+
+    Task<Product?> getByIdForUpdateAsync(
+        int id,
+        CancellationToken cancellationToken);
+    
+    Task<bool> SkuExistsforAnotherProductAsync(
+        string sku,
+        int productId,
+        CancellationToken cancellationToken
+    );
+
+    Task SaveChangesAsync(
+        CancellationToken cancellationToken
+    );
 }

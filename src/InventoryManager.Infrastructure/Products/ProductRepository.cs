@@ -74,5 +74,38 @@ public class ProductRepository : IProductRepository
         return true;
     }
 
+    public async Task<Product?> getByIdForUpdateAsync(
+        int id,
+        CancellationToken cancellationToken
+    )
+    {
+        return await _dbContext.Products.FirstOrDefaultAsync(product => product.Id == id, cancellationToken);
+    }
+
+    public async Task<bool> SkuExistsforAnotherProductAsync(
+        string sku,
+        int productId,
+        CancellationToken cancellationToken
+    )
+    {
+        var normalisedSku = sku.Trim().ToLower();
+
+        return await _dbContext.Products
+            .AsNoTracking()
+            .AnyAsync(
+                product => 
+                    product.Id != productId &&
+                    product.Sku.ToLower() == normalisedSku,
+                    cancellationToken
+            );
+    }
+
+    public async Task SaveChangesAsync(
+        CancellationToken cancellationToken
+    )
+    {
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
 
 }
