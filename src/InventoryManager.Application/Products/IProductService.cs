@@ -2,13 +2,10 @@ namespace InventoryManager.Application.Products;
 
 public interface IProductService
 {
-    IReadOnlyCollection<ProductResponse> GetProducts();
+    Task<IReadOnlyCollection<ProductResponse>> GetProductsAsync(
+        CancellationToken cancellationToken);
 
-    ProductResponse? GetProductById(int id);
-
-    ProductResponse CreateProduct(CreateProductRequest request);
-
-    ProductResponse? UpdateProduct(int id, UpdateProductRequest request);
-
-    bool DeleteProduct(int id);
+    Task<ProductResponse?> GetProductByIdAsync(
+        int id,
+        CancellationToken cancellationToken);
 }

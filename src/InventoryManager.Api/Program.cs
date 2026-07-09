@@ -1,13 +1,22 @@
+using InventoryManager.Application.Common.Interfaces;
 using InventoryManager.Application.Products;
+using InventoryManager.Infrastructure.Persistence;
+using InventoryManager.Infrastructure.Products;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-//Temporary DS of product responses, will change to a database or other data source in the future
-//TODO: Replace with actual data source
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
-builder.Services.AddSingleton<IProductService, ProductService>();
+builder.Services.AddDbContext<InventoryDbContext>(options =>
+{
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+    );
+});
 
 builder.Services.AddOpenApi();
 

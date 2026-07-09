@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryManager.Api.Controllers;
 
-//TODO: Validation!
-
 [ApiController]
 [Route("api/[controller]")]
 public class ProductsController : ControllerBase
@@ -17,17 +15,20 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<ProductResponse>> GetProducts()
+    public async Task<ActionResult<IReadOnlyCollection<ProductResponse>>> GetProducts(
+        CancellationToken cancellationToken)
     {
-        var products = _productService.GetProducts();
+        var products = await _productService.GetProductsAsync(cancellationToken);
 
         return Ok(products);
     }
 
     [HttpGet("{id:int}")]
-    public ActionResult<ProductResponse> GetProductById(int id)
+    public async Task<ActionResult<ProductResponse>> GetProductById(
+        int id,
+        CancellationToken cancellationToken)
     {
-        var product = _productService.GetProductById(id);
+        var product = await _productService.GetProductByIdAsync(id, cancellationToken);
 
         if (product is null)
         {
@@ -35,43 +36,5 @@ public class ProductsController : ControllerBase
         }
 
         return Ok(product);
-    }
-
-    [HttpPost]
-    public ActionResult<ProductResponse> CreateProduct(CreateProductRequest request)
-    {
-        var product = _productService.CreateProduct(request);
-
-        return CreatedAtAction(
-            nameof(GetProductById),
-            new { id = product.Id },
-            product
-        );
-    }
-
-    [HttpPut("{id:int}")]
-    public ActionResult<ProductResponse> UpdateProduct(int id, UpdateProductRequest request)
-    {
-        var updatedProduct = _productService.UpdateProduct(id, request);
-
-        if (updatedProduct is null)
-        {
-            return NotFound();
-        }
-
-        return Ok(updatedProduct);
-    }
-
-    [HttpDelete("{id:int}")]
-    public IActionResult DeleteProduct(int id)
-    {
-        var deleted = _productService.DeleteProduct(id);
-
-        if (!deleted)
-        {
-            return NotFound();
-        }
-
-        return NoContent();
     }
 }

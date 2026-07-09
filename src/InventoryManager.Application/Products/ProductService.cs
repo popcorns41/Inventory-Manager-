@@ -1,91 +1,51 @@
+using InventoryManager.Application.Common.Interfaces;
+
 namespace InventoryManager.Application.Products;
-    
+
 public class ProductService : IProductService
 {
-    private readonly List<ProductResponse> _products =
-    [
-        new ProductResponse(
-            Id: 1,
-            Sku: "SKU-001",
-            Name: "Mechanical Keyboard",
-            Description: "Compact mechanical keyboard",
-            Price: 79.99m,
-            QuantityInStock: 25
-        ),
-        new ProductResponse(
-            Id: 2,
-            Sku: "SKU-002",
-            Name: "USB-C Cable",
-            Description: "1m USB-C charging cable",
-            Price: 9.99m,
-            QuantityInStock: 100
-        )
-    ];
+    private readonly IProductRepository _productRepository;
 
-    public IReadOnlyCollection<ProductResponse> GetProducts()
+    public ProductService(IProductRepository productRepository)
     {
-        return _products.AsReadOnly();
+        _productRepository = productRepository;
     }
 
-    public ProductResponse? GetProductById(int id)
+    public async Task<IReadOnlyCollection<ProductResponse>> GetProductsAsync(
+        CancellationToken cancellationToken)
     {
-        return _products.FirstOrDefault(product => product.Id == id);
+        var products = await _productRepository.GetAllAsync(cancellationToken);
+
+        return products
+            .Select(product => new ProductResponse(
+                product.Id,
+                product.Sku,
+                product.Name,
+                product.Description,
+                product.Price,
+                product.QuantityInStock
+            ))
+            .ToList();
     }
 
-    public ProductResponse CreateProduct(CreateProductRequest request)
+    public async Task<ProductResponse?> GetProductByIdAsync(
+        int id,
+        CancellationToken cancellationToken)
     {
-        var nextId = _products.Count == 0
-            ? 1
-            : _products.Max(product => product.Id) + 1;
+        var product = await _productRepository.GetByIdAsync(id, cancellationToken);
 
-        var product = new ProductResponse(
-            Id: nextId,
-            Sku: request.Sku,
-            Name: request.Name,
-            Description: request.Description,
-            Price: request.Price,
-            QuantityInStock: request.QuantityInStock
-        );
-
-        _products.Add(product);
-
-        return product;
-    }
-
-    public ProductResponse? UpdateProduct(int id, UpdateProductRequest request)
-    {
-        var productIndex = _products.FindIndex(product => product.Id == id);
-
-        if (productIndex == -1)
+        if (product is null)
         {
             return null;
         }
 
-        var updatedProduct = _products[productIndex] with
-        {
-            Sku = request.Sku,
-            Name = request.Name,
-            Description = request.Description,
-            Price = request.Price,
-            QuantityInStock = request.QuantityInStock
-        };
-
-        _products[productIndex] = updatedProduct;
-
-        return updatedProduct;
-    }
-
-    public bool DeleteProduct(int id)
-    {
-        var productIndex = _products.FindIndex(product => product.Id == id);
-
-        if (productIndex == -1)
-        {
-            return false;
-        }
-
-        _products.RemoveAt(productIndex);
-
-        return true;
+        return new ProductResponse(
+            product.Id,
+            product.Sku,
+            product.Name,
+            product.Description,
+            product.Price,
+            product.QuantityInStock
+        );
     }
 }
