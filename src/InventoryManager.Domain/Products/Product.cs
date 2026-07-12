@@ -10,7 +10,8 @@ public class Product
         string name,
         string? description,
         decimal price,
-        int quantityInStock)
+        int quantityInStock,
+        int categoryId)
     {
         //safe validation to prevent formatting misalign in our DB
         ApplyDetails(
@@ -18,7 +19,8 @@ public class Product
             name,
             description,
             price,
-            quantityInStock
+            quantityInStock,
+            categoryId
         );
     }
 
@@ -27,7 +29,8 @@ public class Product
         string name,
         string? description,
         decimal price,
-        int quantityInStock
+        int quantityInStock,
+        int categoryId
     )
     {
         ApplyDetails(
@@ -35,7 +38,8 @@ public class Product
             name,
             description,
             price,
-            quantityInStock
+            quantityInStock,
+            categoryId
         );
     }
     public int Id { get; set; }
@@ -50,13 +54,16 @@ public class Product
 
     public int QuantityInStock { get; set; }
 
+    public int CategoryId {get; set; }
+
     //Helper to both validate product parameters and then re-define class attributes
     private void ApplyDetails(
         string sku,
         string name,
         string? description,
         decimal price,
-        int quantityInStock)
+        int quantityInStock,
+        int categoryId)
     {
         if (string.IsNullOrWhiteSpace(sku))
         {
@@ -87,5 +94,6 @@ public class Product
             : description.Trim();
         Price = price;
         QuantityInStock = quantityInStock;
+        CategoryId = categoryId;
     }
 }

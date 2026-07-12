@@ -6,10 +6,12 @@ namespace InventoryManager.Application.Products;
 public class ProductService : IProductService
 {
     private readonly IProductRepository _productRepository;
+    private readonly ICategoryRepository _categoryRepository;
 
-    public ProductService(IProductRepository productRepository)
+    public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository)
     {
         _productRepository = productRepository;
+        _categoryRepository = categoryRepository;
     }
 
     public async Task<IReadOnlyCollection<ProductResponse>> GetProductsAsync(
@@ -24,7 +26,8 @@ public class ProductService : IProductService
                 product.Name,
                 product.Description,
                 product.Price,
-                product.QuantityInStock
+                product.QuantityInStock,
+                product.CategoryId
             ))
             .ToList();
     }
@@ -46,7 +49,8 @@ public class ProductService : IProductService
             product.Name,
             product.Description,
             product.Price,
-            product.QuantityInStock
+            product.QuantityInStock,
+            product.CategoryId
         );
     }
 
@@ -65,12 +69,26 @@ public class ProductService : IProductService
             );
         }
 
+        var categoryExists = await _categoryRepository.ExistsAsync(
+            request.CategoryId,
+            cancellationToken
+        );
+
+        if (!categoryExists)
+        {
+            throw new ArgumentException(
+                $"Category with ID '{request.CategoryId}' does not exist.",
+                nameof(request.CategoryId)
+            );
+        }
+
         var product = new Product(
             request.Sku,
             request.Name,
             request.Description,
             request.Price,
-            request.QuantityInStock
+            request.QuantityInStock,
+            request.CategoryId
         );
 
         await _productRepository.AddAsync(product, cancellationToken);
@@ -115,12 +133,24 @@ public class ProductService : IProductService
             );
         }
 
+        var categoryExists = await _categoryRepository.ExistsAsync(
+            request.CategoryId,
+            cancellationToken);
+
+        if (!categoryExists)
+        {
+            throw new ArgumentException(
+                $"Category with ID '{request.CategoryId}' does not exist.",
+                nameof(request.CategoryId));
+        }
+
         product.Update(
             request.Sku,
             request.Name,
             request.Description,
             request.Price,
-            request.QuantityInStock
+            request.QuantityInStock,
+            request.CategoryId
         );
         await _productRepository.SaveChangesAsync(cancellationToken);
         
@@ -135,7 +165,8 @@ public class ProductService : IProductService
             product.Name,
             product.Description,
             product.Price,
-            product.QuantityInStock
+            product.QuantityInStock,
+            product.CategoryId
         );
     }
 }

@@ -1,3 +1,4 @@
+using InventoryManager.Domain.Categories;
 using InventoryManager.Domain.Products;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,8 +13,31 @@ public class InventoryDbContext : DbContext
 
     public DbSet<Product> Products => Set<Product>();
 
+    public DbSet<Category> Categories => Set<Category>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Category>(entity =>
+        {
+           entity.ToTable("categories");
+
+           entity.HasKey(category => category.Id);
+
+           entity.Property(category => category.Id).HasColumnName("id");
+
+            entity.Property(category => category.Name)
+                .HasColumnName("name")
+                .HasMaxLength(200)
+                .IsRequired();
+            
+            entity.HasIndex(category => category.Name).IsUnique();
+
+            entity.Property(category => category.Description)
+                .HasColumnName("description")
+                .HasMaxLength(1000);
+            
+
+        });
         modelBuilder.Entity<Product>(entity =>
         {
             entity.ToTable("products");
@@ -48,6 +72,14 @@ public class InventoryDbContext : DbContext
             entity.Property(product => product.QuantityInStock)
                 .HasColumnName("quantity_in_stock")
                 .IsRequired();
+            
+            entity.Property(product => product.CategoryId)
+                .HasColumnName("category_id");
+            
+            entity.HasOne<Category>()
+                .WithMany()
+                .HasForeignKey(product => product.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

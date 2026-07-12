@@ -1,7 +1,12 @@
 using InventoryManager.Application.Common.Interfaces;
 using InventoryManager.Application.Products;
-using InventoryManager.Infrastructure.Persistence;
 using InventoryManager.Infrastructure.Products;
+
+using InventoryManager.Application.Categories;
+using InventoryManager.Infrastructure.Categories;
+
+using InventoryManager.Infrastructure.Persistence;
+
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +15,9 @@ builder.Services.AddControllers();
 
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
 builder.Services.AddDbContext<InventoryDbContext>(options =>
 {

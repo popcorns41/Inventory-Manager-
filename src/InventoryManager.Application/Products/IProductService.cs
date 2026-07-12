@@ -1,5 +1,3 @@
-using InventoryManager.Domain.Products;
-
 namespace InventoryManager.Application.Products;
 
 public interface IProductService
