@@ -3,6 +3,8 @@ using InventoryManager.Domain.Suppliers;
 using InventoryManager.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
+namespace InventoryManager.Infrastructure.Suppliers;
+
 public class SupplierRepository : ISupplierRepository
 {
     private readonly InventoryDbContext _dbContext;
