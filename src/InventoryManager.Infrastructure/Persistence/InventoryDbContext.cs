@@ -1,6 +1,8 @@
+using System.Dynamic;
 using InventoryManager.Domain.Categories;
 using InventoryManager.Domain.Products;
 using InventoryManager.Domain.Suppliers;
+using InventoryManager.Domain.Warehouses;
 using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManager.Infrastructure.Persistence;
@@ -18,8 +20,67 @@ public class InventoryDbContext : DbContext
 
     public DbSet<Supplier> Suppliers => Set<Supplier>();
 
+    public DbSet<Warehouse> Warehouses => Set<Warehouse>();
+
+    public DbSet<WarehouseStock> WarehouseStocks => Set<WarehouseStock>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
+        modelBuilder.Entity<Warehouse>(entity =>
+        {
+            entity.ToTable("warehouses");
+
+            entity.HasKey(warehouse => warehouse.Id);
+
+            entity.Property(warehouse => warehouse.Id).HasColumnName("id");
+
+            entity.Property(warehouse => warehouse.Name)
+                .HasColumnName("name")
+                .HasMaxLength(200)
+                .IsRequired();
+            
+            entity.HasIndex(warehouse => warehouse.Name).IsUnique();
+
+            entity.Property(warehouse => warehouse.Description)
+                .HasColumnName("description")
+                .HasMaxLength(1000);
+        }
+        );
+
+        modelBuilder.Entity<WarehouseStock>(entity =>
+        {
+            entity.ToTable("warehouse_stock");
+
+            entity.HasKey(stock => new
+            {
+                stock.ProductId,
+                stock.WarehouseId
+            });
+
+            entity.Property(stock => stock.ProductId)
+                .HasColumnName("product_id")
+                .IsRequired();
+
+            entity.Property(stock => stock.WarehouseId)
+                .HasColumnName("warehouse_id")
+                .IsRequired();
+
+            entity.Property(stock => stock.QuantityOnHand)
+                .HasColumnName("quantity_on_hand")
+                .IsRequired();
+
+            entity.HasOne<Product>()
+                .WithMany()
+                .HasForeignKey(stock => stock.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne<Warehouse>()
+                .WithMany()
+                .HasForeignKey(stock => stock.WarehouseId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
         modelBuilder.Entity<Category>(entity =>
         {
            entity.ToTable("categories");
@@ -44,7 +105,7 @@ public class InventoryDbContext : DbContext
 
         modelBuilder.Entity<Supplier>(entity =>
         {
-            entity.ToTable("suplliers");
+            entity.ToTable("suppliers");
 
             entity.HasKey(supplier => supplier.Id);
 

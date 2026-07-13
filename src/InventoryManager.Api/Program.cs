@@ -8,6 +8,7 @@ using InventoryManager.Infrastructure.Categories;
 using InventoryManager.Infrastructure.Persistence;
 
 using Microsoft.EntityFrameworkCore;
+using InventoryManager.Application.Suppliers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,9 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 
 builder.Services.AddDbContext<InventoryDbContext>(options =>
 {

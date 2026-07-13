@@ -1,5 +1,3 @@
-using System.Dynamic;
-
 namespace InventoryManager.Domain.Suppliers;
 
 public class Supplier
