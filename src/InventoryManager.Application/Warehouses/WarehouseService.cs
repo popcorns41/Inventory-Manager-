@@ -14,14 +14,55 @@ public class WarehouseService : IWarehouseService
         _warehouseRepo = warehouseRepository;
         _warehouseStockRepo = warehouseStockRepository;
     }
-    public Task<WarehouseResponse> CreateWarehouseAsync(CreateWarehouseRequest request, CancellationToken cancellationToken)
+    public async Task<WarehouseResponse> CreateWarehouseAsync(
+    CreateWarehouseRequest request,
+    CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
-    }
+        var nameAlreadyExists = await _warehouseRepo.NameExistsAsync(
+            request.Name,
+            cancellationToken);
 
-    public Task<bool> DeleteWarehouseAsync(int id, CancellationToken cancellationToken)
+        if (nameAlreadyExists)
+        {
+            throw new InvalidOperationException(
+                $"A warehouse with name '{request.Name}' already exists.");
+        }
+
+        var codeAlreadyExists = await _warehouseRepo.CodeExistsAsync(
+            request.Code,
+            cancellationToken);
+
+        if (codeAlreadyExists)
+        {
+            throw new InvalidOperationException(
+                $"A warehouse with code '{request.Code}' already exists.");
+        }
+
+        var warehouse = new Warehouse(
+            request.Code,
+            request.Name,
+            request.Description);
+
+        await _warehouseRepo.AddAsync(
+            warehouse,
+            cancellationToken);
+
+        return MapToResponse(warehouse);
+    }
+    public async Task<bool> DeleteWarehouseAsync(int id, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var hasStockRecords  = await _warehouseStockRepo.HasStockForWarehouseAsync(id,cancellationToken);
+
+        if (hasStockRecords)
+        {
+             throw new InvalidOperationException(
+                "Cannot delete warehouse because products are assigned to it.");
+        }
+
+        return await _warehouseRepo.DeleteAsync(
+            id,
+            cancellationToken
+        );
     }
 
     public async Task<WarehouseResponse?> GetWarehouseByIdAsync(int id, CancellationToken cancellationToken)
@@ -84,7 +125,7 @@ public class WarehouseService : IWarehouseService
         return MapToResponse(warehouse);
     }
 
-    private WarehouseResponse MapToResponse(Warehouse warehouse)
+    private static WarehouseResponse MapToResponse(Warehouse warehouse)
     {
         return new WarehouseResponse(
                 warehouse.Id,
