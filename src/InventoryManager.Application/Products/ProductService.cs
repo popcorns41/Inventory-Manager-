@@ -27,7 +27,8 @@ public class ProductService : IProductService
                 product.Description,
                 product.Price,
                 product.QuantityInStock,
-                product.CategoryId
+                product.CategoryId,
+                product.SupplierId
             ))
             .ToList();
     }
@@ -50,7 +51,8 @@ public class ProductService : IProductService
             product.Description,
             product.Price,
             product.QuantityInStock,
-            product.CategoryId
+            product.CategoryId,
+            product.SupplierId
         );
     }
 
@@ -88,7 +90,8 @@ public class ProductService : IProductService
             request.Description,
             request.Price,
             request.QuantityInStock,
-            request.CategoryId
+            request.CategoryId,
+            request.SupplierId
         );
 
         await _productRepository.AddAsync(product, cancellationToken);
@@ -150,7 +153,8 @@ public class ProductService : IProductService
             request.Description,
             request.Price,
             request.QuantityInStock,
-            request.CategoryId
+            request.CategoryId,
+            request.SupplierId
         );
         await _productRepository.SaveChangesAsync(cancellationToken);
         
@@ -166,7 +170,8 @@ public class ProductService : IProductService
             product.Description,
             product.Price,
             product.QuantityInStock,
-            product.CategoryId
+            product.CategoryId,
+            product.SupplierId
         );
     }
 }

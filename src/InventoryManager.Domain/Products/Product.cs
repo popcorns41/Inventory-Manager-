@@ -1,3 +1,5 @@
+using InventoryManager.Domain.Suppliers;
+
 namespace InventoryManager.Domain.Products;
 
 public class Product
@@ -11,7 +13,8 @@ public class Product
         string? description,
         decimal price,
         int quantityInStock,
-        int categoryId)
+        int categoryId,
+        int supplierId)
     {
         //safe validation to prevent formatting misalign in our DB
         ApplyDetails(
@@ -20,7 +23,8 @@ public class Product
             description,
             price,
             quantityInStock,
-            categoryId
+            categoryId,
+            supplierId
         );
     }
 
@@ -30,7 +34,8 @@ public class Product
         string? description,
         decimal price,
         int quantityInStock,
-        int categoryId
+        int categoryId,
+        int supplierId
     )
     {
         ApplyDetails(
@@ -39,7 +44,8 @@ public class Product
             description,
             price,
             quantityInStock,
-            categoryId
+            categoryId,
+            supplierId
         );
     }
     public int Id { get; set; }
@@ -56,6 +62,8 @@ public class Product
 
     public int CategoryId {get; set; }
 
+    public int SupplierId {get; set; }
+
     //Helper to both validate product parameters and then re-define class attributes
     private void ApplyDetails(
         string sku,
@@ -63,7 +71,8 @@ public class Product
         string? description,
         decimal price,
         int quantityInStock,
-        int categoryId)
+        int categoryId,
+        int supplierId)
     {
         if (string.IsNullOrWhiteSpace(sku))
         {
@@ -95,5 +104,6 @@ public class Product
         Price = price;
         QuantityInStock = quantityInStock;
         CategoryId = categoryId;
+        SupplierId = supplierId;
     }
 }

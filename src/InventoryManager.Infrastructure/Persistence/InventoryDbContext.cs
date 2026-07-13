@@ -1,5 +1,6 @@
 using InventoryManager.Domain.Categories;
 using InventoryManager.Domain.Products;
+using InventoryManager.Domain.Suppliers;
 using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManager.Infrastructure.Persistence;
@@ -14,6 +15,8 @@ public class InventoryDbContext : DbContext
     public DbSet<Product> Products => Set<Product>();
 
     public DbSet<Category> Categories => Set<Category>();
+
+    public DbSet<Supplier> Suppliers => Set<Supplier>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -38,6 +41,28 @@ public class InventoryDbContext : DbContext
             
 
         });
+
+        modelBuilder.Entity<Supplier>(entity =>
+        {
+            entity.ToTable("suplliers");
+
+            entity.HasKey(supplier => supplier.Id);
+
+            entity.Property(supplier => supplier.Id).HasColumnName("id");
+
+            entity.Property(supplier => supplier.Name)
+                .HasColumnName("name")
+                .HasMaxLength(200)
+                .IsRequired();
+            
+            entity.HasIndex(supplier => supplier.Name).IsUnique();
+
+            entity.Property(supplier => supplier.Description)
+                .HasColumnName("description")
+                .HasMaxLength(1000);
+        });
+
+
         modelBuilder.Entity<Product>(entity =>
         {
             entity.ToTable("products");
@@ -79,6 +104,14 @@ public class InventoryDbContext : DbContext
             entity.HasOne<Category>()
                 .WithMany()
                 .HasForeignKey(product => product.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.Property(product => product.SupplierId)
+                .HasColumnName("supplier_id");
+
+            entity.HasOne<Supplier>()
+                .WithMany()
+                .HasForeignKey(product => product.SupplierId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
     }

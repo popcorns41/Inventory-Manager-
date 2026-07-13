@@ -6,5 +6,6 @@ public record CreateProductRequest(
     string? Description,
     decimal Price,
     int QuantityInStock,
-    int CategoryId
+    int CategoryId,
+    int SupplierId
 );

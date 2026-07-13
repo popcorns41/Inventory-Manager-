@@ -7,5 +7,6 @@ public record ProductResponse(
     string? Description,
     decimal Price,
     int QuantityInStock,
-    int categoryId
+    int CategoryId,
+    int SupplierId
 );
