@@ -5,10 +5,16 @@ using InventoryManager.Infrastructure.Products;
 using InventoryManager.Application.Categories;
 using InventoryManager.Infrastructure.Categories;
 
+using InventoryManager.Application.Suppliers;
+using InventoryManager.Infrastructure.Suppliers;
+
+using InventoryManager.Application.Warehouses;
+using InventoryManager.Infrastructure.Warehouses;
+
 using InventoryManager.Infrastructure.Persistence;
 
 using Microsoft.EntityFrameworkCore;
-using InventoryManager.Application.Suppliers;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +28,9 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
 builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
+
+builder.Services.AddScoped<IWarehouseService, WarehouseService>();
+builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
 
 builder.Services.AddDbContext<InventoryDbContext>(options =>
 {
