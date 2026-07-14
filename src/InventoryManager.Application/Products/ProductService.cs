@@ -8,10 +8,13 @@ public class ProductService : IProductService
     private readonly IProductRepository _productRepository;
     private readonly ICategoryRepository _categoryRepository;
 
-    public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository)
+    private readonly IWarehouseStockRepository _warehouseStockRepository;
+
+    public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository, IWarehouseStockRepository warehouseStockRepository)
     {
         _productRepository = productRepository;
         _categoryRepository = categoryRepository;
+        _warehouseStockRepository = warehouseStockRepository;
     }
 
     public async Task<IReadOnlyCollection<ProductResponse>> GetProductsAsync(
@@ -104,6 +107,16 @@ public class ProductService : IProductService
         CancellationToken cancellationToken
     )
     {
+        var hasStockRecords = await _warehouseStockRepository.HasStockForProductAsync(
+        id,
+        cancellationToken);
+
+        if (hasStockRecords)
+        {
+            throw new InvalidOperationException(
+                $"Cannot delete product with ID '{id}' because it has warehouse stock records.");
+        }
+
         return await _productRepository.DeleteAsync(id, cancellationToken);
     }
 

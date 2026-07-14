@@ -6,11 +6,11 @@ namespace InventoryManager.Api.controllers;
 [ApiController]
 [Route("api/[controller]")]
 
-public class WarehouseController : ControllerBase
+public class WarehousesController : ControllerBase
 {
     private readonly IWarehouseService _WarehouseService;
 
-    public WarehouseController(IWarehouseService warehouseService)
+    public WarehousesController(IWarehouseService warehouseService)
     {
         _WarehouseService = warehouseService;
     }
