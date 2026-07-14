@@ -45,6 +45,18 @@ builder.Services.AddDbContext<InventoryDbContext>(options =>
 
 builder.Services.AddOpenApi();
 
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -63,6 +75,8 @@ app.MapGet("/health", () => new
     service = "InventoryManager.Api",
     timestamp = DateTime.UtcNow
 });
+
+app.UseCors("Frontend");
 
 app.MapControllers();
 
