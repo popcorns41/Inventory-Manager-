@@ -78,16 +78,22 @@ public class WarehousesController : ControllerBase
         int id,
         CancellationToken cancellationToken
     )
-    {   
+    {
+        try
+        {
+            var deleted = await _WarehouseService.DeleteWarehouseAsync(
+                id,
+                cancellationToken
+            );
 
-        var deleted = await _WarehouseService.DeleteWarehouseAsync(
-            id,
-            cancellationToken
-        );
+            if (!deleted) return NotFound();
 
-        if (!deleted) return NotFound();
-
-        return NoContent();
+            return NoContent();
+        } catch (InvalidOperationException e)
+        {
+            return Conflict(e.Message);
+        }
+        
     }
 
     [HttpPut("{id:int}")]

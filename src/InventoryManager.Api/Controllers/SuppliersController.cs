@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using InventoryManager.Application.Suppliers;
 using Microsoft.AspNetCore.Mvc;
 
@@ -78,16 +79,24 @@ public class SuppliersController : ControllerBase
         int id,
         CancellationToken cancellationToken
     )
-    {   
+    {
+        try
+        {
+             var deleted = await _SupplierService.DeleteSupplierAsync(
+                id,
+                cancellationToken
+            );
 
-        var deleted = await _SupplierService.DeleteSupplierAsync(
-            id,
-            cancellationToken
-        );
+            if (!deleted) return NotFound();
 
-        if (!deleted) return NotFound();
+            return NoContent();
+            
+        } catch (InvalidOperationException e)
+        {
+            return Conflict(e.Message);
+        }
 
-        return NoContent();
+       
     }
 
     [HttpPut("{id:int}")]

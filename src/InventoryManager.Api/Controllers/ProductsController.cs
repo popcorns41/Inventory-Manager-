@@ -68,17 +68,25 @@ public class ProductsController : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteProduct(
         int id,
-        CancellationToken cancellationToken
-    )
+        CancellationToken cancellationToken)
     {
-        var deleted = await _productService.DeleteProductAsync(
-            id,
-            cancellationToken
-        );
+        try
+        {
+            var deleted = await _productService.DeleteProductAsync(
+                id,
+                cancellationToken);
 
-        if (!deleted) return NotFound();
+            if (!deleted)
+            {
+                return NotFound();
+            }
 
-        return NoContent();
+            return NoContent();
+        }
+        catch (InvalidOperationException exception)
+        {
+            return Conflict(exception.Message);
+        }
     }
 
     [HttpPut("{id:int}")]
