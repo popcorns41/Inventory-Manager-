@@ -24,6 +24,11 @@ public interface IProductRepository
         CancellationToken cancellationToken
     );
 
+    Task<bool> ExistsAsync(
+        int id,
+        CancellationToken cancellationToken
+    );
+
     Task<Product?> getByIdForUpdateAsync(
         int id,
         CancellationToken cancellationToken);

@@ -2,7 +2,7 @@ using System.Diagnostics;
 using InventoryManager.Application.Suppliers;
 using Microsoft.AspNetCore.Mvc;
 
-namespace InventoryManager.Api.controllers;
+namespace InventoryManager.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

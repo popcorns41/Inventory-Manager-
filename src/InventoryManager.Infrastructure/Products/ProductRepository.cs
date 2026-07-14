@@ -81,6 +81,18 @@ public class ProductRepository : IProductRepository
         return await _dbContext.Products.FirstOrDefaultAsync(product => product.Id == id, cancellationToken);
     }
 
+    public async Task<bool> ExistsAsync(
+        int id,
+        CancellationToken cancellationToken
+    )
+    {
+        return await _dbContext.Products
+        .AsNoTracking()
+        .AnyAsync(
+            product => product.Id == id,
+            cancellationToken);
+    }
+
     public async Task<bool> SkuExistsforAnotherProductAsync(
         string sku,
         int productId,

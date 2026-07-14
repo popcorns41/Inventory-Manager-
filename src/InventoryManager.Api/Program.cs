@@ -14,6 +14,7 @@ using InventoryManager.Infrastructure.Warehouses;
 using InventoryManager.Infrastructure.Persistence;
 
 using Microsoft.EntityFrameworkCore;
+using InventoryManager.Application.Inventory;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +33,8 @@ builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 builder.Services.AddScoped<IWarehouseService, WarehouseService>();
 builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
 builder.Services.AddScoped<IWarehouseStockRepository, WarehouseStockRepository>();
+
+builder.Services.AddScoped<IInventoryService, InventoryService>(); 
 
 builder.Services.AddDbContext<InventoryDbContext>(options =>
 {

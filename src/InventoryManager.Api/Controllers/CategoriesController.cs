@@ -1,7 +1,7 @@
 using InventoryManager.Application.Categories;
 using Microsoft.AspNetCore.Mvc;
 
-namespace InventoryManager.Api.controllers;
+namespace InventoryManager.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
