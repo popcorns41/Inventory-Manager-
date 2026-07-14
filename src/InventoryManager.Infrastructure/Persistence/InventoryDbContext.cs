@@ -35,6 +35,14 @@ public class InventoryDbContext : DbContext
 
             entity.Property(warehouse => warehouse.Id).HasColumnName("id");
 
+             entity.Property(warehouse => warehouse.Code)
+                .HasColumnName("code")
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.HasIndex(warehouse => warehouse.Code)
+                .IsUnique();
+
             entity.Property(warehouse => warehouse.Name)
                 .HasColumnName("name")
                 .HasMaxLength(200)

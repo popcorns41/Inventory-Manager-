@@ -31,6 +31,7 @@ builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 
 builder.Services.AddScoped<IWarehouseService, WarehouseService>();
 builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
+builder.Services.AddScoped<IWarehouseStockRepository, WarehouseStockRepository>();
 
 builder.Services.AddDbContext<InventoryDbContext>(options =>
 {
