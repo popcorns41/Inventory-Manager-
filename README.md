@@ -12,9 +12,6 @@ The project is being developed as a practical exercise in full-stack architectur
 
 ![Products and suppliers UI](docs/images/products-suppliers-ui.png)
 
-### Backend project structure
-
-![Backend project structure](docs/images/backend-project-structure.png)
 
 ## Current functionality
 
@@ -110,8 +107,8 @@ Install the following:
 ### 1. Clone the repository
 
 ```bash
-git clone <repository-url>
-cd <repository-directory>
+git clone [<repository-url>](https://github.com/popcorns41/Inventory-Manager-.git)
+cd [<repository-directory>](Inventory-Manager)
 ```
 
 Replace the placeholders with the repository URL and local directory name.
