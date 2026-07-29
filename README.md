@@ -107,8 +107,8 @@ Install the following:
 ### 1. Clone the repository
 
 ```bash
-git clone [<repository-url>](https://github.com/popcorns41/Inventory-Manager-.git)
-cd [<repository-directory>](Inventory-Manager)
+git clone https://github.com/popcorns41/Inventory-Manager-.git
+cd Inventory-Manager
 ```
 
 Replace the placeholders with the repository URL and local directory name.
